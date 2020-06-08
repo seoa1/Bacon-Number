@@ -31,6 +31,9 @@ class TestTiny(unittest.TestCase):
         
     def test_05(self):
         self.assertTrue(set() == lab.actors_with_bacon_number(self.data, 3))
+        
+    def test_06(self):
+        self.assertTrue([4724, 2876, 1640] == lab.bacon_path(self.data, 1640))
 
 class Test01_ActedTogether(unittest.TestCase):
     def setUp(self):
