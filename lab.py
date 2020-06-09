@@ -127,10 +127,12 @@ def build_actors_movie_dictionary(data):
             actor_movies[actor2_id] = set([movie_id])
     return actor_movies
 
-def movie_path(data, movie_data, actor_id_1, actor_id_2):
+def movie_path(data, actor_id_1, actor_id_2):
     my_path = actor_to_actor_path(data, actor_id_1, actor_id_2)
     actor_movies = build_actors_movie_dictionary(data)
     out_path = []
+    with open('resources/movies.pickle', 'rb') as f:
+        movie_data = pickle.load(f)
     for i in range(len(my_path) - 1):
         actor1_movies = actor_movies[my_path[i]]
         actor2_movies = actor_movies[my_path[i + 1]]
@@ -146,33 +148,65 @@ def movie_path(data, movie_data, actor_id_1, actor_id_2):
     return out_path
 
 def actor_path(data, actor_id_1, goal_test_function):
-    raise NotImplementedError("Implement me!")
-
+    with open('resources/names.pickle', 'rb') as f:
+        names = pickle.load(f)
+    valid_actors = []
+    for actor_id in names.values():
+        if goal_test_function(actor_id):
+            valid_actors.append(actor_id)
+    if len(valid_actors) == len(names):
+        return [actor_id_1]
+    if len(valid_actors) == 0:
+        return None
+    best_path = []
+    for actor in valid_actors:
+        my_path = actor_to_actor_path(data, actor_id_1, actor)
+        if len(best_path) == 0 or len(my_path) < len(best_path):
+            best_path = my_path
+    return best_path
 
 def actors_connecting_films(data, film1, film2):
-    raise NotImplementedError("Implement me!")
-
-
+    actor_1_id = 0
+    actor_2_id = 0
+    actor_3_id = 0
+    actor_4_id = 0
+    for movie in data:
+        if movie[2] == film1:
+            actor_1_id = movie[0]
+            actor_2_id = movie[1]
+        elif movie[2] == film2:
+            actor_3_id = movie[0]
+            actor_4_id = movie[1]
+    path1 = actor_to_actor_path(data, actor_1_id, actor_3_id)
+    path2 = actor_to_actor_path(data, actor_1_id, actor_4_id)
+    path3 = actor_to_actor_path(data, actor_2_id, actor_3_id)
+    path4 = actor_to_actor_path(data, actor_2_id, actor_4_id)
+    paths = [path1, path2, path3, path4]
+    valid_paths = []
+    for i in range(4):
+        if paths[i] != None:
+            valid_paths.append(paths[i])
+    if len(valid_paths) == 0:
+        return None
+    min_path = []
+    for path in valid_paths:
+        if len(min_path) == 0 or len(path) < len(min_path):
+            min_path = path
+    return min_path
+    
+    
 if __name__ == '__main__':
     # with open('resources/small.pickle', 'rb') as f:
     #     smalldb = pickle.load(f)
-
     # additional code here will be run only when lab.py is invoked directly
     # (not when imported from test.py), so this is a good place to put code
     # used, for example, to generate the results for the online questions.
     
-    with open('resources/movies.pickle', 'rb') as f:
-        movies = pickle.load(f)
+    
     with open('resources/large.pickle', 'rb') as f:
         large = pickle.load(f)
-    with open('resources/names.pickle', 'rb') as f:
-        names = pickle.load(f)
-    for name, m_id in names.items():
-        if name == "Steve Guttenberg":
-            print("Steve", m_id)
-        if name == "Iva Ilakovac":
-            print("Iva", m_id)
-    
-        
-    print(movie_path(large, movies, 26472, 1345462))
+    for movie in large:
+        if movie[2] == 142416:
+            print(movie[0],movie[1])
+    # print(actors_connecting_films(large, 142416, 44521))
   
