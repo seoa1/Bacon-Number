@@ -165,33 +165,23 @@ def actor_path(data, actor_id_1, goal_test_function):
             best_path = my_path
     return best_path
 
+
+
 def actors_connecting_films(data, film1, film2):
-    actor_1_id = 0
-    actor_2_id = 0
-    actor_3_id = 0
-    actor_4_id = 0
+    movie_1_actors = set()
+    movie_2_actors = set()
     for movie in data:
         if movie[2] == film1:
-            actor_1_id = movie[0]
-            actor_2_id = movie[1]
+            movie_1_actors.add(movie[0])
+            movie_1_actors.add(movie[1])
         elif movie[2] == film2:
-            actor_3_id = movie[0]
-            actor_4_id = movie[1]
-    path1 = actor_to_actor_path(data, actor_1_id, actor_3_id)
-    path2 = actor_to_actor_path(data, actor_1_id, actor_4_id)
-    path3 = actor_to_actor_path(data, actor_2_id, actor_3_id)
-    path4 = actor_to_actor_path(data, actor_2_id, actor_4_id)
-    paths = [path1, path2, path3, path4]
-    valid_paths = []
-    for i in range(4):
-        if paths[i] != None:
-            valid_paths.append(paths[i])
-    if len(valid_paths) == 0:
-        return None
-    min_path = []
-    for path in valid_paths:
-        if len(min_path) == 0 or len(path) < len(min_path):
-            min_path = path
+            movie_2_actors.add(movie[0])
+            movie_2_actors.add(movie[1])
+    min_path = None
+    for actor in movie_1_actors:
+        pot_path = actor_path(data, actor, lambda actor: actor in movie_2_actors)
+        if pot_path != None and (min_path == None or len(pot_path) < len(min_path)):
+            min_path = pot_path
     return min_path
     
     
@@ -205,8 +195,6 @@ if __name__ == '__main__':
     
     with open('resources/large.pickle', 'rb') as f:
         large = pickle.load(f)
-    for movie in large:
-        if movie[2] == 142416:
-            print(movie[0],movie[1])
+    print(actors_connecting_films(large, 142416, 44521))
     # print(actors_connecting_films(large, 142416, 44521))
   
